@@ -1,97 +1,122 @@
-[![CI](https://github.com/SWI-Prolog/swipl/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SWI-Prolog/swipl/actions/workflows/ci.yml)
+# dieT : A Diet Planning Expert System
 
-# SWI-Prolog: A comprehensive Prolog implementation
+## Technologies & Tools
 
-SWI-Prolog is an open  source  (BSD-2)   implementation  of  the  Prolog
-language with many extensions. It is implemented   in C (version 11) and
-Prolog and is available for many platforms (Linux, practically any POSIX
-like system, MacOS, Windows). All  CPUs   supported  by Debian Linux are
-supported. A prototype running  in  your   browser  based  on  WASM (Web
-Assembly) is available.
+![Backend](https://img.shields.io/badge/Backend-Python%20%28Flask%29-blue?style=for-the-badge&logo=python)
+![Knowledge Representation](https://img.shields.io/badge/Knowledge%20Representation-Prolog-red?style=for-the-badge&logo=swipl)
+![Database](https://img.shields.io/badge/Database-SQLite-lightgrey?style=for-the-badge&logo=sqlite)
+![AI Integration](https://img.shields.io/badge/AI-Google%20Gemini-purple?style=for-the-badge)
+![Frontend](https://img.shields.io/badge/Frontend-HTML%2C%20CSS%2C%20JavaScript-blue?style=for-the-badge)
+![ORM](https://img.shields.io/badge/ORM-SQLAlchemy-green?style=for-the-badge)
 
-(SWI-)Prolog is a versatile language. It is being used for business rule
-validation, natural language processing, software verification, software
-refactoring, network configuration,  security,   robotics,  reasoning in
-legal and medical domains,  graph   processing,  machine  learning (ILP,
-PLP), linked data (RDF), mathematical proofs, and much more.
+---
 
-If you are interested in commercial   assistence to make SWI-Prolog work
-in   your   organization,   please     contact   [SWI-Prolog   Solutions
-b.v.](https://swi-prolog.com/).
+## Aim
+To represent knowledge using Prolog by implementing a small expert system for personalized diet planning based on health conditions, dietary preferences, and user profiles.  
 
+---
 
-## Forking, cloning and submitting patches
+## 1. Problem Statement
+Many individuals struggle to find dietary recommendations tailored to their health conditions and preferences.  
+General advice often ignores medical conditions, restrictions, and individual differences.  
+This project addresses that by creating an intelligent system for personalized nutrition guidance.  
 
-This           repository           uses             many           [Git
-submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).   This
-causes the common issue that __fork   and clone doesn't work__. Instead,
-_clone_  from  https://github.com/SWI-Prolog/swipl-devel.git   and  then
-associate your clone with your  _fork_   (replace  `me` with your github
-user name).
+---
 
-    git clone https://github.com/SWI-Prolog/swipl-devel.git
-    cd swipl-devel
-    git submodule update --init
-    git remote add myfork git@github.com:me/swipl-devel.git
+## 2. Introduction
+**HealthWiseDiet** is a knowledge-based expert system providing personalized diet recommendations.  
+It integrates **rule-based reasoning via Prolog** with **Python Flask web application**, and enhances insights using **Google Gemini AI**.  
+Supports users with **diabetes, hypertension, heart disease, obesity**, and dietary preferences like **vegetarian and vegan**.  
 
-See [How to submit a patch](https://www.swi-prolog.org/howto/SubmitPatch.html)
-for details.
+---
 
-See   also   the   discussion    at     [Being    friendly    to   quick
-contributions](https://swi-prolog.discourse.group/t/being-friendly-to-quick-contributions/493/6)
+## 3. Modules & Features
 
+### 1. User Authentication & Profile Management
+- Registration & Login with secure authentication  
+- Profile Editing to update health information and preferences  
+- Session Management using Flask-Login  
 
-## Building
+### 2. Rule-Based Diet Recommendation Engine
+- **Prolog Knowledge Base (`kb.pl`)** encodes nutrition rules and condition-based guidelines  
+- Python-Prolog integration via **PySwip**  
+- Personalized recommendations based on age, gender, BMI, health conditions, and diet type  
 
-See
-[CMAKE.md](https://github.com/SWI-Prolog/swipl-devel/blob/master/CMAKE.md)
-and [Build SWI-Prolog from source](https://www.swi-prolog.org/build/)
+### 3. AI-Enhanced Advice
+- **Gemini AI (`gemini_ai.py`)** provides health insights, meal timing tips, and lifestyle suggestions  
 
+### 4. Personalized Meal Plan Generation
+- Structured daily meal plans (breakfast, lunch, dinner, snacks)  
+- Randomized balanced meals for variety  
 
-## Web home
+### 5. Plan Management
+- Save, view, and delete personalized plans  
 
-Please   find   the   up-to-date   information     on    SWI-Prolog   at
-https://www.swi-prolog.org.
+### 6. UI & Experience
+- Flask HTML templates for smooth navigation  
+- Feedback & notifications for user actions  
 
-## Trying SWI-Prolog online
+### 7. Database Management
+- **SQLAlchemy ORM** for secure storage of user data, preferences, and saved plans  
 
-An    online    version    of     SWI-Prolog      is     provided     by
-[SWISH](https://swish.swi-prolog.org). Note that this version is subject
-to sandbox restrictions and does not provide the features most valued in
-SWI-Prolog such as its rich set of interfaces, multi-threading, modules,
-etc.
+---
 
-Alternatively, there is  a WASM (_Web Assembly_)  version available at
-https://wasm.swi-prolog.org/wasm/shell.   This  version has  no  sandbox
-restrictions.  The  WASM build  allows interaction with  the browser's
-DOM, so it allows for interactive Prolog applications running _inside_
-the browser.  It is otherwise rather limited though.
+## 4. Dataset Information
+**Prolog Knowledge Base (`kb.pl`)** derived from Kaggle datasets:  
+- Nutritional Facts of Common Foods  
+- Nutritional Food Facts  
+- Food Suitable for Diabetes  
+- Daily Meal Nutrition and Diseases  
 
+**Dataset Features:**  
+- 200+ food items categorized by health impact & nutrition  
+- Rules for diabetes, hypertension, heart disease, obesity  
+- Food classification for vegetarian, vegan, non-veg  
+- Age and BMI-based recommendations  
+- Focused on **Indian cuisine**  
 
-## Forum/mailing list
+---
 
-Our       forum       is       hosted        at       a       [Discourse
-site](https://swi-prolog.discourse.group/). The forum provides   a  mail
-list interface.
+## 5. Code Overview
+| File | Description |
+|------|--------------|
+| `app.py` | Flask application and routes |
+| `kb.pl` | Prolog knowledge base defining rules |
+| `diet_planner.py` | Python-Prolog interface for recommendations |
+| `gemini_ai.py` | AI-enhanced insights via Gemini API |
+| `models.py` | Database models for users and plans |
+| `forms.py` | Web form handling and validation |
 
+---
 
-## Documentation
+## 6. Results
+- Personalized diet recommendations based on health, preferences, age, BMI, and lifestyle  
+- Outputs:  
+  1. Lists of recommended & avoided foods  
+  2. Structured meal plans (breakfast, lunch, dinner, snacks)  
+  3. AI-generated nutrition insights & lifestyle tips  
+  4. Personalized advice on meal timing & supplements  
 
-Documentation is available from several locations and in several formats.
+---
 
-  - Several tutorials can be accessed from the __Tutorials__ menu on
-    the [home page](https://www.swi-prolog.org)
+## 7. Screenshots
+- Home / Landing Page  
+- User Registration Page  
+- Login Interface  
+- Health Profile Input Form  
+- Recommendations Page  
+- Meal Plan Visualization  
+- Saved Plans Dashboard  
 
-  - A HTML version of the documentation is in the `doc/Manual` directory
-    of the installation.  Note that some packagers put this documentation
-    elsewhere or require it to be installed separately.
+---
 
-    These docs can be searched using `?- apropos("query").`.  Help on
-    a predicate can be disaplayed using e.g., `?- help(append/3).`
+## 8. Conclusion
+**HealthWiseDiet** demonstrates the application of **knowledge representation in Prolog** for real-world health challenges.  
+Combining **symbolic AI, web technologies, and AI insights**, it delivers personalized dietary guidance considering complex relationships between health conditions, food properties, and user preferences.  
 
-  - A PDF version of the documentation is available from the [download
-    page](https://www.swi-prolog.org/download/devel)
+**Future Enhancements:**  
+- Expand knowledge base to cover international cuisines  
+- Add nutrient-level reasoning  
+- Develop mobile application for wider accessibility  
 
-You  can  also  install  the  website    locally  to  use  its  complete
-functionality   if   you   are    offline.     It    is   available   at
-https://github.com/SWI-Prolog/plweb.
+---
