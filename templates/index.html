@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}dieT - Health Condition Based Diet Planner{% endblock %}
+
+{% block content %}
+<header class="text-center mb-4">
+    <div class="logo-container mb-3">
+        <div class="logo">
+            <span class="logo-text">die<span class="logo-highlight">T</span></span>
+            <i class="fas fa-utensils logo-icon"></i>
+        </div>
+    </div>
+    <h1 class="site-title">Your Smart Diet Planner</h1>
+    <p class="lead">Personalized nutrition recommendations based on your health profile</p>
+</header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-user-md"></i> Your Health Information
+            </div>
+            <div class="card-body">
+                <form id="diet-form" action="{{ url_for('recommendations') }}" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" name="age" min="1" max="120" required>
+                            <div id="age-error" class="error-message"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight" name="weight" min="1" step="0.1" required>
+                            <div id="weight-error" class="error-message"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="height" class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="height" name="height" min="1" max="250" required>
+                            <div id="height-error" class="error-message"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Gender</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" id="gender-male" value="male" required>
+                            <label class="form-check-label" for="gender-male">Male</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" id="gender-female" value="female">
+                            <label class="form-check-label" for="gender-female">Female</label>
+                        </div>
+                        <div id="gender-error" class="error-message"></div>
+                    </div>
+
+                    <div id="bmi-display" class="bg-dark mb-3 text-center">
+                        <p class="mb-1">Your BMI:</p>
+                        <span id="bmi-result">--</span>
+                        <p>Category: <span id="bmi-category"></span></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Health Conditions <span class="text-danger">*</span></label>
+                        <p class="text-muted small">Select all that apply</p>
+                        <div class="health-options">
+                            <div class="form-check">
+                                <input class="form-check-input condition-checkbox" type="checkbox" name="conditions" id="condition-none" value="none">
+                                <label class="form-check-label" for="condition-none" data-bs-toggle="tooltip" data-bs-placement="top" title="No specific health conditions">
+                                    <strong>None</strong>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input condition-checkbox" type="checkbox" name="conditions" id="condition-diabetes" value="diabetes">
+                                <label class="form-check-label" for="condition-diabetes" data-bs-toggle="tooltip" data-bs-placement="top" title="Type 1 or Type 2 Diabetes">
+                                    Diabetes
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input condition-checkbox" type="checkbox" name="conditions" id="condition-hypertension" value="hypertension">
+                                <label class="form-check-label" for="condition-hypertension" data-bs-toggle="tooltip" data-bs-placement="top" title="High Blood Pressure">
+                                    Hypertension
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input condition-checkbox" type="checkbox" name="conditions" id="condition-heart" value="heart_disease">
+                                <label class="form-check-label" for="condition-heart" data-bs-toggle="tooltip" data-bs-placement="top" title="Coronary Heart Disease, Heart Failure, etc.">
+                                    Heart Disease
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input condition-checkbox" type="checkbox" name="conditions" id="condition-obesity" value="obesity">
+                                <label class="form-check-label" for="condition-obesity" data-bs-toggle="tooltip" data-bs-placement="top" title="BMI over 30">
+                                    Obesity
+                                </label>
+                            </div>
+                        </div>
+                        <div id="conditions-error" class="text-danger"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Dietary Preferences <span class="text-danger">*</span></label>
+                        <div class="health-options">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="preferences" id="pref-nonveg" value="non_vegetarian">
+                                <label class="form-check-label" for="pref-nonveg" data-bs-toggle="tooltip" data-bs-placement="top" title="Includes all types of meat, fish, and animal products">
+                                    Non-Vegetarian
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="preferences" id="pref-vegetarian" value="vegetarian">
+                                <label class="form-check-label" for="pref-vegetarian" data-bs-toggle="tooltip" data-bs-placement="top" title="No meat, but allows dairy and eggs">
+                                    Vegetarian
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="preferences" id="pref-vegan" value="vegan">
+                                <label class="form-check-label" for="pref-vegan" data-bs-toggle="tooltip" data-bs-placement="top" title="No animal products">
+                                    Vegan
+                                </label>
+                            </div>
+                        </div>
+                        <div id="preferences-error" class="text-danger"></div>
+                    </div>
+                    
+                    <!-- Required Health Analysis Questions -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-chart-line me-2"></i> Required Health Analysis</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">These details are required for your personalized diet recommendations</p>
+                            
+                            <!-- Activity Level -->
+                            <div class="mb-3">
+                                <label class="form-label">Physical Activity Level <span class="text-danger">*</span></label>
+                                <select class="form-select" id="activity-level" name="activity_level" required>
+                                    <option value="">--Select--</option>
+                                    <option value="none">None (No regular physical activity)</option>
+                                    <option value="sedentary">Sedentary (Little to no exercise)</option>
+                                    <option value="light">Light (Light exercise 1-3 days/week)</option>
+                                    <option value="moderate">Moderate (Moderate exercise 3-5 days/week)</option>
+                                    <option value="active">Active (Hard exercise 6-7 days/week)</option>
+                                    <option value="very_active">Very Active (Very hard exercise & physical job)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Sleep Hours -->
+                            <div class="mb-3">
+                                <label for="sleep-hours" class="form-label">Average Sleep Hours <span class="text-danger">*</span></label>
+                                <select class="form-select" id="sleep-hours" name="sleep_hours" required>
+                                    <option value="">--Select--</option>
+                                    <option value="less_than_5">Less than 5 hours</option>
+                                    <option value="5_to_6">5-6 hours</option>
+                                    <option value="7">7 hours</option>
+                                    <option value="8">8 hours</option>
+                                    <option value="more_than_8">More than 8 hours</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Stress Level -->
+                            <div class="mb-3">
+                                <label class="form-label">Stress Level <span class="text-danger">*</span></label>
+                                <select class="form-select" id="stress-level" name="stress_level" required>
+                                    <option value="">--Select--</option>
+                                    <option value="none">None</option>
+                                    <option value="low">Low</option>
+                                    <option value="moderate">Moderate</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Water Intake -->
+                            <div class="mb-3">
+                                <label class="form-label">Daily Water Intake <span class="text-danger">*</span></label>
+                                <select class="form-select" id="water-intake" name="water_intake" required>
+                                    <option value="">--Select--</option>
+                                    <option value="low">Less than 4 cups</option>
+                                    <option value="moderate">4-8 cups</option>
+                                    <option value="high">More than 8 cups</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Food Allergies -->
+                            <div class="mb-3">
+                                <label class="form-label">Food Allergies/Intolerances <span class="text-danger">*</span></label>
+                                <div class="health-options">
+                                    <div class="form-check">
+                                        <input class="form-check-input allergy-checkbox" type="checkbox" name="allergies" id="allergy-none" value="none">
+                                        <label class="form-check-label" for="allergy-none"><strong>None</strong></label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input allergy-checkbox" type="checkbox" name="allergies" id="allergy-dairy" value="dairy">
+                                        <label class="form-check-label" for="allergy-dairy">Dairy</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input allergy-checkbox" type="checkbox" name="allergies" id="allergy-gluten" value="gluten">
+                                        <label class="form-check-label" for="allergy-gluten">Gluten</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input allergy-checkbox" type="checkbox" name="allergies" id="allergy-nuts" value="nuts">
+                                        <label class="form-check-label" for="allergy-nuts">Nuts</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input allergy-checkbox" type="checkbox" name="allergies" id="allergy-shellfish" value="shellfish">
+                                        <label class="form-check-label" for="allergy-shellfish">Shellfish</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input allergy-checkbox" type="checkbox" name="allergies" id="allergy-soy" value="soy">
+                                        <label class="form-check-label" for="allergy-soy">Soy</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback">Please select at least one option</div>
+                            </div>
+                            
+                            <!-- Meal Timing -->
+                            <div class="mb-3">
+                                <label class="form-label">Meal Timing Preference <span class="text-danger">*</span></label>
+                                <select class="form-select" id="meal-timing" name="meal_timing" required>
+                                    <option value="">--Select--</option>
+                                    <option value="regular">Regular (3 meals per day)</option>
+                                    <option value="intermittent_fasting">Intermittent Fasting</option>
+                                    <option value="small_frequent">Small, Frequent Meals (5-6 per day)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Health Goals -->
+                            <div class="mb-3">
+                                <label class="form-label">Health Goals <span class="text-danger">*</span></label>
+                                <div class="health-options">
+                                    <div class="form-check">
+                                        <input class="form-check-input goal-checkbox" type="checkbox" name="goals" id="goal-none" value="none">
+                                        <label class="form-check-label" for="goal-none"><strong>None</strong></label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input goal-checkbox" type="checkbox" name="goals" id="goal-weight-loss" value="weight_loss">
+                                        <label class="form-check-label" for="goal-weight-loss">Weight Loss</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input goal-checkbox" type="checkbox" name="goals" id="goal-muscle-gain" value="muscle_gain">
+                                        <label class="form-check-label" for="goal-muscle-gain">Muscle Gain</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input goal-checkbox" type="checkbox" name="goals" id="goal-better-sleep" value="better_sleep">
+                                        <label class="form-check-label" for="goal-better-sleep">Better Sleep</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input goal-checkbox" type="checkbox" name="goals" id="goal-more-energy" value="more_energy">
+                                        <label class="form-check-label" for="goal-more-energy">More Energy</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input goal-checkbox" type="checkbox" name="goals" id="goal-disease-management" value="disease_management">
+                                        <label class="form-check-label" for="goal-disease-management">Manage Health Condition</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback">Please select at least one option</div>
+                            </div>
+                            
+                            <!-- Current Supplements -->
+                            <div class="mb-3">
+                                <label class="form-label">Current Supplements <span class="text-danger">*</span></label>
+                                <div class="health-options">
+                                    <div class="form-check">
+                                        <input class="form-check-input supplement-checkbox" type="checkbox" name="supplements" id="supplement-none" value="none">
+                                        <label class="form-check-label" for="supplement-none"><strong>None</strong></label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input supplement-checkbox" type="checkbox" name="supplements" id="supplement-multivitamin" value="multivitamin">
+                                        <label class="form-check-label" for="supplement-multivitamin">Multivitamin</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input supplement-checkbox" type="checkbox" name="supplements" id="supplement-vitamin-d" value="vitamin_d">
+                                        <label class="form-check-label" for="supplement-vitamin-d">Vitamin D</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input supplement-checkbox" type="checkbox" name="supplements" id="supplement-omega" value="omega_3">
+                                        <label class="form-check-label" for="supplement-omega">Omega-3</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input supplement-checkbox" type="checkbox" name="supplements" id="supplement-protein" value="protein">
+                                        <label class="form-check-label" for="supplement-protein">Protein</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input supplement-checkbox" type="checkbox" name="supplements" id="supplement-probiotics" value="probiotics">
+                                        <label class="form-check-label" for="supplement-probiotics">Probiotics</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback">Please select at least one option</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-utensils me-2"></i>Generate Diet Plan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+{% endblock %}

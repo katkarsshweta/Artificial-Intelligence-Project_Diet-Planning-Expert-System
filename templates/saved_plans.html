@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Diet Plans - dieT{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="section-title">
+                    <i class="fas fa-clipboard-list me-2 text-primary"></i> Your Saved Diet Plans
+                </h1>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Create New Plan
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    
+    {% if plans %}
+    <div class="row">
+        {% for plan in plans %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>{{ plan.name }}</h5>
+                    <span class="badge bg-light text-dark">
+                        {{ plan.created_at.strftime('%b %d') }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if plan.description %}
+                    <p>{{ plan.description }}</p>
+                    {% else %}
+                    <p class="text-muted"><em>No description provided</em></p>
+                    {% endif %}
+                    
+                    <!-- Plan overview -->
+                    <div class="plan-overview mt-3">
+                        {% if plan.plan_data.user_data.conditions %}
+                        <div class="mb-2">
+                            <span class="badge bg-secondary me-1">Conditions:</span>
+                            {% for condition in plan.plan_data.user_data.conditions[:3] %}
+                            <span class="badge bg-info text-dark">{{ condition|replace('_', ' ')|capitalize }}</span>
+                            {% endfor %}
+                            {% if plan.plan_data.user_data.conditions|length > 3 %}
+                            <span class="badge bg-secondary">+{{ plan.plan_data.user_data.conditions|length - 3 }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if plan.plan_data.user_data.preferences %}
+                        <div class="mb-2">
+                            <span class="badge bg-secondary me-1">Diet:</span>
+                            {% for preference in plan.plan_data.user_data.preferences %}
+                            <span class="badge bg-success">{{ preference|capitalize }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if plan.plan_data.recommended %}
+                        <div class="small text-muted mt-3">
+                            <strong>Top recommendations:</strong> 
+                            {{ plan.plan_data.recommended[:3]|join(', ') }}
+                            {% if plan.plan_data.recommended|length > 3 %}...{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between bg-light">
+                    <a href="{{ url_for('view_plan', plan_id=plan.id) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i> View Plan
+                    </a>
+                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                            data-bs-toggle="modal" data-bs-target="#deletePlanModal{{ plan.id }}">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deletePlanModal{{ plan.id }}" tabindex="-1" 
+             aria-labelledby="deletePlanModalLabel{{ plan.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deletePlanModalLabel{{ plan.id }}">
+                            Confirm Delete
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete "<strong>{{ plan.name }}</strong>"? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{ url_for('delete_plan', plan_id=plan.id) }}" method="post">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center my-5 py-5">
+        <div class="empty-state">
+            <i class="fas fa-clipboard-list fa-5x text-muted mb-3"></i>
+            <h3>No Diet Plans Saved Yet</h3>
+            <p class="text-muted">Create a personalized diet plan to save it for easy reference later.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">
+                <i class="fas fa-plus-circle me-1"></i> Create Your First Plan
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hover-card {
+        transition: transform 0.2s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+    .empty-state {
+        padding: 2rem;
+    }
+</style>
+{% endblock %}

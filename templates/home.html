@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to dieT - Your Smart Diet Planner{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <div class="hero-section my-5">
+                <h1 class="display-4 fw-bold">Welcome to <span class="logo-text-large">die<span class="logo-highlight">T</span></span></h1>
+                <p class="lead">Your personalized diet planner powered by AI and expert knowledge</p>
+                
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center my-4">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i> Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-brain fa-3x text-primary"></i>
+                    </div>
+                    <h3 class="card-title">Smart Recommendations</h3>
+                    <p class="card-text">Get personalized diet advice based on your health conditions, preferences, and nutritional needs.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-utensils fa-3x text-primary"></i>
+                    </div>
+                    <h3 class="card-title">Meal Planning</h3>
+                    <p class="card-text">Receive customized meal plans with breakfast, lunch, dinner, and snack suggestions.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-clipboard-list fa-3x text-primary"></i>
+                    </div>
+                    <h3 class="card-title">Save & Track</h3>
+                    <p class="card-text">Save your diet plans and easily refer back to them whenever you need.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-lg-10 mx-auto">
+            <div class="card mb-4 shadow">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">How It Works</h2>
+                    <div class="row g-4">
+                        <div class="col-md-3 text-center">
+                            <div class="step-circle mx-auto">1</div>
+                            <h5 class="mt-3">Create Account</h5>
+                            <p class="small">Register with your information to get started.</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="step-circle mx-auto">2</div>
+                            <h5 class="mt-3">Enter Health Data</h5>
+                            <p class="small">Share your health conditions and preferences.</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="step-circle mx-auto">3</div>
+                            <h5 class="mt-3">Get Recommendations</h5>
+                            <p class="small">Receive AI-powered diet recommendations.</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="step-circle mx-auto">4</div>
+                            <h5 class="mt-3">Save & Use</h5>
+                            <p class="small">Save your plans and access them anytime.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4 mb-5">
+        <h3>Ready to get started?</h3>
+        <p class="lead">Create an account now and discover your personalized diet plan</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5 mt-3">
+            <i class="fas fa-user-plus me-2"></i> Register for Free
+        </a>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        padding: 3rem 0;
+    }
+    .logo-text-large {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 800;
+        font-size: 1.2em;
+    }
+    .feature-icon {
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .step-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--bs-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+{% endblock %}

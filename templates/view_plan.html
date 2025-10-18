@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plan.name }} - dieT{% endblock %}
+
+{% block content %}
+<div class="plan-view-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title mb-0">
+            <i class="fas fa-clipboard-check me-2 text-primary"></i> {{ plan.name }}
+        </h2>
+        <div>
+            <a href="{{ url_for('saved_plans') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Plans
+            </a>
+            <button class="btn btn-primary ms-2" id="print-plan">
+                <i class="fas fa-print me-1"></i> Print
+            </button>
+        </div>
+    </div>
+    
+    {% if plan.description %}
+    <div class="plan-description mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-info-circle me-2 text-info"></i> Plan Description</h5>
+                <p class="card-text">{{ plan.description }}</p>
+                <div class="text-muted small">Created: {{ plan.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- User Profile Summary -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-user-circle"></i> Health Profile
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Age:</strong> {{ plan.plan_data.user_data.age }} years</p>
+                    <p><strong>Weight:</strong> {{ plan.plan_data.user_data.weight }} kg</p>
+                    <p><strong>Height:</strong> {{ plan.plan_data.user_data.height }} cm</p>
+                    <p><strong>Gender:</strong> {{ plan.plan_data.user_data.gender|capitalize }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>BMI:</strong> {{ plan.plan_data.user_data.bmi }} 
+                        {% if plan.plan_data.user_data.bmi < 18.5 %}
+                            <span class="text-warning">(Underweight)</span>
+                        {% elif plan.plan_data.user_data.bmi < 25 %}
+                            <span class="text-success">(Normal)</span>
+                        {% elif plan.plan_data.user_data.bmi < 30 %}
+                            <span class="text-warning">(Overweight)</span>
+                        {% else %}
+                            <span class="text-danger">(Obese)</span>
+                        {% endif %}
+                    </p>
+                    
+                    {% if plan.plan_data.user_data.conditions %}
+                    <p><strong>Health Conditions:</strong></p>
+                    <ul>
+                        {% for condition in plan.plan_data.user_data.conditions %}
+                        <li>{{ condition|replace('_', ' ')|capitalize }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p><strong>Health Conditions:</strong> None specified</p>
+                    {% endif %}
+                    
+                    {% if plan.plan_data.user_data.preferences %}
+                    <p><strong>Dietary Preferences:</strong></p>
+                    <ul>
+                        {% for preference in plan.plan_data.user_data.preferences %}
+                        <li>{{ preference|capitalize }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Recommended Foods -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-check-circle"></i> Recommended Foods
+                </div>
+                <div class="card-body">
+                    {% if plan.plan_data.recommended %}
+                    <ul class="food-list">
+                        {% for food in plan.plan_data.recommended|sort %}
+                        <li class="recommended-food">
+                            <i class="fas fa-check me-2"></i> {{ food }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No specific recommendations available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Foods to Avoid -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <i class="fas fa-times-circle"></i> Foods to Avoid
+                </div>
+                <div class="card-body">
+                    {% if plan.plan_data.avoid %}
+                    <ul class="food-list">
+                        {% for food in plan.plan_data.avoid|sort %}
+                        <li class="avoid-food">
+                            <i class="fas fa-times me-2"></i> {{ food }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No specific foods to avoid.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Meal Plan -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-utensils"></i> Your Personalized Meal Plan
+        </div>
+        <div class="card-body meal-plan-container p-4">
+            {% if plan.plan_data.meal_plan %}
+            <div class="row">
+                <!-- Breakfast -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="meal-section">
+                        <div class="meal-icon-container">
+                            <div class="meal-icon-circle bg-warning">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                        </div>
+                        <h5 class="meal-title">
+                            <i class="fas fa-sun me-2 text-warning"></i> Breakfast
+                        </h5>
+                        {% if plan.plan_data.meal_plan.breakfast %}
+                        <ul class="food-list">
+                            {% for food in plan.plan_data.meal_plan.breakfast %}
+                            <li class="meal-item">
+                                <span class="meal-item-dot"></span>
+                                {{ food }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No specific recommendations</p>
+                        {% endif %}
+                        <div class="meal-time-badge">7:00 - 9:00 AM</div>
+                    </div>
+                </div>
+
+                <!-- Lunch -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="meal-section">
+                        <div class="meal-icon-container">
+                            <div class="meal-icon-circle bg-success">
+                                <i class="fas fa-hamburger"></i>
+                            </div>
+                        </div>
+                        <h5 class="meal-title">
+                            <i class="fas fa-cloud-sun me-2 text-success"></i> Lunch
+                        </h5>
+                        {% if plan.plan_data.meal_plan.lunch %}
+                        <ul class="food-list">
+                            {% for food in plan.plan_data.meal_plan.lunch %}
+                            <li class="meal-item">
+                                <span class="meal-item-dot"></span>
+                                {{ food }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No specific recommendations</p>
+                        {% endif %}
+                        <div class="meal-time-badge">12:00 - 2:00 PM</div>
+                    </div>
+                </div>
+
+                <!-- Dinner -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="meal-section">
+                        <div class="meal-icon-container">
+                            <div class="meal-icon-circle bg-danger">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                        </div>
+                        <h5 class="meal-title">
+                            <i class="fas fa-moon me-2 text-danger"></i> Dinner
+                        </h5>
+                        {% if plan.plan_data.meal_plan.dinner %}
+                        <ul class="food-list">
+                            {% for food in plan.plan_data.meal_plan.dinner %}
+                            <li class="meal-item">
+                                <span class="meal-item-dot"></span>
+                                {{ food }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No specific recommendations</p>
+                        {% endif %}
+                        <div class="meal-time-badge">6:00 - 8:00 PM</div>
+                    </div>
+                </div>
+
+                <!-- Snacks -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="meal-section">
+                        <div class="meal-icon-container">
+                            <div class="meal-icon-circle bg-info">
+                                <i class="fas fa-apple-alt"></i>
+                            </div>
+                        </div>
+                        <h5 class="meal-title">
+                            <i class="fas fa-clock me-2 text-info"></i> Snacks
+                        </h5>
+                        {% if plan.plan_data.meal_plan.snacks %}
+                        <ul class="food-list">
+                            {% for food in plan.plan_data.meal_plan.snacks %}
+                            <li class="meal-item">
+                                <span class="meal-item-dot"></span>
+                                {{ food }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No specific recommendations</p>
+                        {% endif %}
+                        <div class="meal-time-badge">Between Meals</div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <div class="meal-plan-tips">
+                    <i class="fas fa-lightbulb text-warning me-2"></i>
+                    <span>Remember to drink plenty of water throughout the day for optimal hydration!</span>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">No meal plan available for this saved plan.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Gemini AI Analysis Section -->
+    {% if plan.plan_data.ai_analysis and not plan.plan_data.ai_analysis.error %}
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <i class="fas fa-brain me-2"></i> AI-Enhanced Diet Analysis
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <h5 class="mb-2">Health Profile Analysis</h5>
+                    <p>{{ plan.plan_data.ai_analysis.analysis }}</p>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <h5 class="mb-2">Nutritional Insights</h5>
+                    <ul class="list-group">
+                        {% for insight in plan.plan_data.ai_analysis.nutritional_insights %}
+                        <li class="list-group-item">{{ insight }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <h5 class="mb-2">Lifestyle Tips</h5>
+                    <ul class="list-group">
+                        {% for tip in plan.plan_data.ai_analysis.lifestyle_tips %}
+                        <li class="list-group-item">{{ tip }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <h5 class="mb-2">Meal Timing Advice</h5>
+                    <p>{{ plan.plan_data.ai_analysis.meal_timing_advice }}</p>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <h5 class="mb-2">Supplement Considerations</h5>
+                    <p>{{ plan.plan_data.ai_analysis.supplement_advice }}</p>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light text-muted small">
+                <i class="fas fa-robot me-2"></i> Analysis provided by Google's Gemini AI, which complemented the Prolog expert system's recommendations
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+    document.getElementById('print-plan').addEventListener('click', function() {
+        window.print();
+    });
+</script>
+{% endblock %}
+{% endblock %}

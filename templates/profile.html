@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - dieT{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i>Profile</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        <i class="fas fa-user-circle fa-5x text-primary"></i>
+                    </div>
+                    <h5 class="mb-0">{{ current_user.username }}</h5>
+                    <p class="text-muted small">{{ current_user.email }}</p>
+                    <hr>
+                    <div class="profile-stats">
+                        <div class="row text-center">
+                            <div class="col">
+                                <h5 class="mb-0">{{ current_user.diet_plans|length }}</h5>
+                                <small class="text-muted">Saved Plans</small>
+                            </div>
+                            {% if current_user.created_at %}
+                            <div class="col">
+                                <h5 class="mb-0">{{ current_user.created_at.strftime('%b %Y') }}</h5>
+                                <small class="text-muted">Joined</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('saved_plans') }}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-clipboard-list me-1"></i> View Saved Diet Plans
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-cog me-2"></i>Edit Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.first_name.label(class="form-label") }}
+                                    {{ form.first_name(class="form-control", placeholder="Your first name") }}
+                                    {% for error in form.first_name.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.last_name.label(class="form-label") }}
+                                    {{ form.last_name(class="form-control", placeholder="Your last name") }}
+                                    {% for error in form.last_name.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control", placeholder="Your email address") }}
+                            {% for error in form.email.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <h5 class="mt-4 mb-3 border-bottom pb-2">Health Information</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.age.label(class="form-label") }}
+                                    {{ form.age(class="form-control", placeholder="Your age") }}
+                                    {% for error in form.age.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.gender.label(class="form-label") }}
+                                    {{ form.gender(class="form-select") }}
+                                    {% for error in form.gender.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.weight.label(class="form-label") }}
+                                    {{ form.weight(class="form-control", placeholder="Weight in kg") }}
+                                    {% for error in form.weight.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.height.label(class="form-label") }}
+                                    {{ form.height(class="form-control", placeholder="Height in cm") }}
+                                    {% for error in form.height.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if current_user.height and current_user.weight and current_user.height > 0 %}
+                        <div class="alert alert-info">
+                            <strong>Your BMI:</strong> {{ (current_user.weight / ((current_user.height/100) ** 2))|round(1) }}
+                            
+                            {% set bmi = (current_user.weight / ((current_user.height/100) ** 2))|round(1) %}
+                            {% if bmi < 18.5 %}
+                                <span class="badge bg-warning">Underweight</span>
+                            {% elif bmi < 25 %}
+                                <span class="badge bg-success">Normal</span>
+                            {% elif bmi < 30 %}
+                                <span class="badge bg-warning">Overweight</span>
+                            {% else %}
+                                <span class="badge bg-danger">Obese</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
